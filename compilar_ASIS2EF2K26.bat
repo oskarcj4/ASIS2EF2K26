@@ -8,6 +8,7 @@ REM ==================================================================
 REM Proposito :
 REM  Compila Contabilidad (Modelo, Controlador y Vista) y el ejecutable
 REM  Ejecucion_ASIS2EF2K26 (x64) usando las DLL de la carpeta dll.
+REM  Las DLL se copian del proyecto original proyectoasis22k26-Navegador.
 REM Reglas especificas:
 REM  Se detiene en el primer proyecto que falle.
 REM ==================================================================
@@ -36,6 +37,20 @@ if not defined MSB (
 echo MSBuild: %MSB%
 echo Configuracion: %CONFIG%
 echo.
+
+set "ORIGEN=C:\Users\oskar\Desktop\proyectoasis22k26-Navegador\codigo\componentes\seguridad\Seguridad\CapaVista_Seguridad\bin\Debug"
+if not exist "%ORIGEN%\CapaVista_Seguridad.dll" (
+    echo No se encontraron las DLL en %ORIGEN%
+    exit /b 1
+)
+echo Copiando DLL desde %ORIGEN%
+if not exist "%RAIZ%\dll" mkdir "%RAIZ%\dll"
+xcopy /y /q "%ORIGEN%\*.dll" "%RAIZ%\dll\" > nul
+del /q "%RAIZ%\dll\CapaModelo_Contabilidad.dll" "%RAIZ%\dll\CapaControlador_Contabilidad.dll" "%RAIZ%\dll\CapaVista_Contabilidad.dll" 2> nul
+echo.
+
+call :compilar "%RAIZ%\codigo\componentes\seguridad\Seguridad\CapaModelo_Seguridad\CapaModelo_Seguridad.csproj" || goto :fallo
+copy /y "%RAIZ%\codigo\componentes\seguridad\Seguridad\CapaModelo_Seguridad\bin\%CONFIG%\CapaModelo_Seguridad.dll" "%RAIZ%\dll\" > nul
 
 call :compilar "%CO%\CapaModelo_Contabilidad\CapaModelo_Contabilidad.csproj" || goto :fallo
 call :compilar "%CO%\CapaControlador_Contabilidad\CapaControlador_Contabilidad.csproj" || goto :fallo
